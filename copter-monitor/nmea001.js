@@ -404,6 +404,96 @@ var NMEA = ( function() {
     // =====================================
     // sentence parsers
     // =====================================
+    /** TIROT parser object */
+    nmea.TirotParser = function(id) {
+      this.id = id;
+      this.parse = function(tokens) {
+        var i;
+        var obj;
+        if(tokens.length < 2) {
+          nmea.error('TIROT : not enough tokens');
+          return null;
+        }
+
+        // trim whitespace
+        // some parsers may not want the tokens trimmed so the individual parser has to do it if applicable
+        for( i = 0; i < tokens.length; ++i) {
+          tokens[i] = tokens[i].trim();
+        }
+
+        obj = {
+          id : tokens[0].substr(1),
+          turnRate : nmea.parseFloatX(tokens[1]),
+          status : tokens[2],
+        };
+
+        return obj;
+      };
+    };
+
+    /** WIMWV parser object */
+    nmea.WimwvParser = function(id) {
+      this.id = id;
+      this.parse = function(tokens) {
+        var i;
+        var obj;
+        if(tokens.length < 5) {
+          nmea.error('WIMWV : not enough tokens');
+          return null;
+        }
+
+        // trim whitespace
+        // some parsers may not want the tokens trimmed so the individual parser has to do it if applicable
+        for( i = 0; i < tokens.length; ++i) {
+          tokens[i] = tokens[i].trim();
+        }
+
+        obj = {
+          id : tokens[0].substr(1),
+          windAngle : nmea.parseFloatX(tokens[1]),
+          windReference : tokens[2],
+          windSpeedKnots : nmea.parseFloatX(tokens[3]),
+          status : tokens[5] // A = data valid; V = data invalid
+        };
+
+        return obj;
+      };
+    };
+
+    /** WIMDA parser object */
+    nmea.WimdaParser = function(id) {
+      this.id = id;
+      this.parse = function(tokens) {
+        var i;
+        var wimda;
+        if(tokens.length < 20) {
+          nmea.error('WIMDA : not enough tokens');
+          return null;
+        }
+
+        // trim whitespace
+        // some parsers may not want the tokens trimmed so the individual parser has to do it if applicable
+        for( i = 0; i < tokens.length; ++i) {
+          tokens[i] = tokens[i].trim();
+        }
+
+        wimda = {
+          id : tokens[0].substr(1),
+          pressureMercury : nmea.parseFloatX(tokens[1]),
+          pressureBars : nmea.parseFloatX(tokens[3]),
+          airTemp : nmea.parseFloatX(tokens[5]),
+          humidity : nmea.parseFloatX(tokens[9]),
+          dewPoint : nmea.parseFloatX(tokens[11]),
+          windDirTrue : nmea.parseFloatX(tokens[13]),
+          windDirMag : nmea.parseFloatX(tokens[15]),
+          windSpeedKnots : nmea.parseFloatX(tokens[17]),
+          windSpeedMPS : nmea.parseFloatX(tokens[19])
+        };
+
+        return wimda;
+      };
+    };
+
     /** GPGGA parser object */
     nmea.GgaParser = function(id) {
       this.id = id;
@@ -683,7 +773,7 @@ var NMEA = ( function() {
         }
       }
       if(result === null) {
-        this.error('sentence id not found');
+        this.error('sentence id ('+id+') not found');
       }
 
       return result;
@@ -740,6 +830,10 @@ var NMEA = ( function() {
     nmea.addParser(new nmea.GgaParser("GPGGA"));
     nmea.addParser(new nmea.RmcParser("GPRMC"));
     nmea.addParser(new nmea.GsvParser("GPGSV"));
+
+    nmea.addParser(new nmea.WimdaParser("WIMDA"));
+    nmea.addParser(new nmea.WimwvParser("WIMWV"));
+    nmea.addParser(new nmea.TirotParser("TIROT"));
 
     // add the standard encoders
     nmea.addEncoder(new nmea.GgaEncoder("GPGGA"));

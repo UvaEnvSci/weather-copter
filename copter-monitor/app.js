@@ -33,6 +33,12 @@ $(function(){
   // do something with the input from the port
   var textarea = $('#serialConsole');    
   var onLineReceived = function(strReceived) {
+    try {
+      showData( NMEA.parse(strReceived) );
+    } catch(err){
+      // Todo: do something with the parsing error
+      console.log(err.message);
+    }
     textarea.val(strReceived+"\n"+textarea.val());
   };
   var stringReceived = '';
@@ -41,14 +47,50 @@ $(function(){
       var str = ab2str(info.data);
       if (str.charAt(str.length-1) === '\n') {
         stringReceived += str.substring(0, str.length-1);
-        onLineReceived(stringReceived);
-        stringReceived = '';
+        onLineReceived( stringReceived.substr(0, stringReceived.indexOf('\n')+1) ); 
+        stringReceived = stringReceived.substr(stringReceived.indexOf('\n')+1, stringReceived.length);
+        //onLineReceived(stringReceived);
+        //stringReceived = '';
       } else {
         stringReceived += str;
       }
     }
   };
   chrome.serial.onReceive.addListener(onReceiveCallback);
+
+  var infoPane = $('#infoPane');
+  var infoList = $('<dl></dl>').appendTo(infoPane);
+  var pressure = $('<dt>pressure</dt><dd></dd>').hide().appendTo(infoList);
+  var airTemp = $('<dt>air temperature</dt><dd></dd>').hide().appendTo(infoList);
+  var humidity = $('<dt>humidity</dt><dd></dd>').hide().appendTo(infoList);
+  var dewPoint = $('<dt>dew point</dt><dd></dd>').hide().appendTo(infoList);
+  var windDir = $('<dt>wind direction</dt><dd></dd>').hide().appendTo(infoList);
+  var windSpeed = $('<dt>wind speed</dt><dd></dd>').hide().appendTo(infoList);
+  var windAngle = $('<dt>wind angle</dt><dd></dd>').hide().appendTo(infoList);
+  var windReference = $('<dt>wind reference</dt><dd></dd>').hide().appendTo(infoList);
+  var turnRate = $('<dt>turn rate</dt><dd></dd>').hide().appendTo(infoList);
+  var showData = function(obj){
+    if(!obj.status || obj.status == 'A') {
+      if(obj.pressureMercury != null && obj.pressureBars != null)
+        pressure.show().filter('dd').html(obj.pressureMercury+' ('+obj.pressureBars+')');
+      if(obj.airTemp != null)
+        airTemp.show().filter('dd').html(obj.airTemp);
+      if(obj.humidity != null)
+        humidity.show().filter('dd').html(obj.humidity);
+      if(obj.dewPoint != null)
+        dewPoint.show().filter('dd').html(obj.dewPoint);
+      if(obj.windDirTrue != null  && obj.windDirMag != null)
+        windDir.show().filter('dd').html(obj.windDirTrue+' ('+obj.windDirMag+' magnetic)');
+      if(obj.windSpeedKnots != null)
+        windSpeed.show().filter('dd').html(obj.windSpeedKnots+' knots');
+      if(obj.windAngle != null)
+        windAngle.show().filter('dd').html(obj.windAngle);
+      if(obj.windReference != null)
+        windReference.show().filter('dd').html(obj.windReference);
+      if(obj.turnRate != null)
+        turnRate.show().filter('dd').html(obj.turnRate);
+    }
+  };
 
   function ab2str(buf) {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
