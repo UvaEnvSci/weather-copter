@@ -47,10 +47,12 @@ $(function(){
       var str = ab2str(info.data);
       if (str.charAt(str.length-1) === '\n') {
         stringReceived += str.substring(0, str.length-1);
-        onLineReceived( stringReceived.substr(0, stringReceived.indexOf('\n')+1) ); 
-        stringReceived = stringReceived.substr(stringReceived.indexOf('\n')+1, stringReceived.length);
-        //onLineReceived(stringReceived);
-        //stringReceived = '';
+        var parts = stringReceived.split('$');
+        onLineReceived( '$'+parts.pop() );
+        if (parts.length) 
+            stringReceived = '$'+parts.join('$'); 
+//        onLineReceived( stringReceived.substr(0, stringReceived.indexOf('\n')+1) ); 
+//        stringReceived = stringReceived.substr(stringReceived.indexOf('\n')+1, stringReceived.length);
       } else {
         stringReceived += str;
       }
@@ -66,11 +68,20 @@ $(function(){
   var dewPoint = $('<dt>dew point</dt><dd></dd>').hide().appendTo(infoList);
   var windDir = $('<dt>wind direction</dt><dd></dd>').hide().appendTo(infoList);
   var windSpeed = $('<dt>wind speed</dt><dd></dd>').hide().appendTo(infoList);
+  var windSpeed2 = $('<dt>wind speed #2</dt><dd></dd>').hide().appendTo(infoList);
   var windAngle = $('<dt>wind angle</dt><dd></dd>').hide().appendTo(infoList);
   var windReference = $('<dt>wind reference</dt><dd></dd>').hide().appendTo(infoList);
   var turnRate = $('<dt>turn rate</dt><dd></dd>').hide().appendTo(infoList);
+  var windChill = $('<dt>wind chill</dt><dd></dd>').hide().appendTo(infoList);
+  var baroPressure = $('<dt>barometric pressure</dt><dd></dd>').hide().appendTo(infoList);
+  var pitch = $('<dt>pitch</dt><dd></dd>').hide().appendTo(infoList);
+  var roll = $('<dt>roll</dt><dd></dd>').hide().appendTo(infoList);
+  var course = $('<dt>course over ground</dt><dd></dd>').hide().appendTo(infoList);
+  var speed = $('<dt>speed over ground</dt><dd></dd>').hide().appendTo(infoList);
+  var time = $('<dt>time</dt><dd></dd>').hide().appendTo(infoList);
+
   var showData = function(obj){
-    if(!obj.status || obj.status == 'A') {
+    if(obj && (!obj['status'] || obj['status'] == 'A')) {
       if(obj.pressureMercury != null && obj.pressureBars != null)
         pressure.show().filter('dd').html(obj.pressureMercury+' ('+obj.pressureBars+')');
       if(obj.airTemp != null)
@@ -83,12 +94,28 @@ $(function(){
         windDir.show().filter('dd').html(obj.windDirTrue+' ('+obj.windDirMag+' magnetic)');
       if(obj.windSpeedKnots != null)
         windSpeed.show().filter('dd').html(obj.windSpeedKnots+' knots');
+      if(obj.windSpeedKnots2 != null)
+        windSpeed2.show().filter('dd').html(obj.windSpeedKnots2+' knots ('+obj.windSpeedMPS+' meters/second)');
       if(obj.windAngle != null)
         windAngle.show().filter('dd').html(obj.windAngle);
       if(obj.windReference != null)
         windReference.show().filter('dd').html(obj.windReference);
       if(obj.turnRate != null)
         turnRate.show().filter('dd').html(obj.turnRate);
+      if(obj.windChillRelative != null)
+        windChill.show().filter('dd').html(obj.windChillRelative+'('+obj.windChillTheoretical+')');
+      if(obj.barometricPressure != null)
+        baroPressure.show().filter('dd').html(obj.barometricPressure);        
+      if(obj.pitch != null)
+        pitch.show().filter('dd').html(obj.pitch);
+      if(obj.roll != null)
+        roll.show().filter('dd').html(obj.roll);
+      if(obj.groundCourseTrue != null)
+        course.show().filter('dd').html(obj.groundCourseTrue+'('+obj.groundCourseMagnetic+')');
+      if(obj.speedKnots != null)
+        speed.show().filter('dd').html(obj.speedKmHr+'('+obj.speedKmHr+')');
+      if(obj.time != null)
+        time.show().filter('dd').html(obj.time);
     }
   };
 

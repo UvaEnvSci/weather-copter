@@ -404,6 +404,99 @@ var NMEA = ( function() {
     // =====================================
     // sentence parsers
     // =====================================
+    /** GPVTG parser object */
+    nmea.GpvtgParser = function(id) {
+      this.id = id;
+      this.parse = function(tokens) {
+        var i;
+        var obj;
+        if(tokens.length < 6) {
+          nmea.error('GPVTG : not enough tokens');
+          return null;
+        }
+
+        // trim whitespace
+        // some parsers may not want the tokens trimmed so the individual parser has to do it if applicable
+        for( i = 0; i < tokens.length; ++i) {
+          tokens[i] = tokens[i].trim();
+        }
+
+        obj = {
+          id : tokens[0].substr(1),
+          groundCourseTrue : nmea.parseFloatX(tokens[1]),
+          groundCourseMagnetic : nmea.parseFloatX(tokens[3]),
+          speedKnots : nmea.parseFloatX(tokens[5]),
+          speedKmHr : nmea.parseFloatX(tokens[7]),
+          modeIndicator : tokens[9]
+        };
+
+        return obj;
+      };
+    };
+
+    /** GPZDA parser object */
+    nmea.GpzdaParser = function(id) {
+      this.id = id;
+      this.parse = function(tokens) {
+        var i;
+        var obj;
+
+        // trim whitespace
+        // some parsers may not want the tokens trimmed so the individual parser has to do it if applicable
+        for( i = 0; i < tokens.length; ++i) {
+          tokens[i] = tokens[i].trim();
+        }
+
+        obj = {
+          id : tokens[0].substr(1),
+          time : tokens[1],
+          day : tokens[2],
+          month : tokens[2],
+          year : tokens[4],
+          tzHours : tokens[5],
+          tzMinutes : tokens[6]
+        };
+
+        return obj;
+      };
+    };
+
+    /** YXXDR parser object */
+    nmea.YxxdrParser = function(id) {
+      this.id = id;
+      this.parse = function(tokens) {
+        var i;
+        var obj;
+
+        // trim whitespace
+        // some parsers may not want the tokens trimmed so the individual parser has to do it if applicable
+        for( i = 0; i < tokens.length; ++i) {
+          tokens[i] = tokens[i].trim();
+        }
+
+        //This sentence has two version A and B
+        // A version
+        if (tokens[1] == 'C') {
+          obj = {
+            id : tokens[0].substr(1),
+            windChillRelative : nmea.parseFloatX(tokens[2]),
+            windChillTheoretical : nmea.parseFloatX(tokens[6]),
+            barometricPressure : nmea.parseFloatX(tokens[14])
+          };
+        }
+        // B version
+        else if (tokens[1] == 'A') {
+          obj = {
+            id : tokens[0].substr(1),
+            pitch : nmea.parseFloatX(tokens[2]),
+            roll : nmea.parseFloatX(tokens[6])
+          };
+        }
+
+        return obj;
+      };
+    };
+
     /** TIROT parser object */
     nmea.TirotParser = function(id) {
       this.id = id;
@@ -486,7 +579,7 @@ var NMEA = ( function() {
           dewPoint : nmea.parseFloatX(tokens[11]),
           windDirTrue : nmea.parseFloatX(tokens[13]),
           windDirMag : nmea.parseFloatX(tokens[15]),
-          windSpeedKnots : nmea.parseFloatX(tokens[17]),
+          windSpeedKnots2 : nmea.parseFloatX(tokens[17]),
           windSpeedMPS : nmea.parseFloatX(tokens[19])
         };
 
@@ -749,10 +842,10 @@ var NMEA = ( function() {
       //    much simpler.  for a proprietary talker + standard string, just instantiate the parser twice
       // This version implements approach #2
       id = tokens[0].substring(1);
-      if(id.length !== 5) {
-        this.error('i must be exactly 5 characters');
-        return null;
-      }
+//      if(id.length !== 5) {
+//        this.error('i must be exactly 5 characters');
+//        return null;
+//      }
 
       // checksum format = *HH where HH are hex digits that convert to a 1 byte value
       if(checksum !== null) {
@@ -834,6 +927,9 @@ var NMEA = ( function() {
     nmea.addParser(new nmea.WimdaParser("WIMDA"));
     nmea.addParser(new nmea.WimwvParser("WIMWV"));
     nmea.addParser(new nmea.TirotParser("TIROT"));
+    nmea.addParser(new nmea.YxxdrParser("YXXDR"));
+    nmea.addParser(new nmea.GpzdaParser("GPZDA"));
+    nmea.addParser(new nmea.GpvtgParser("GPVTG"));
 
     // add the standard encoders
     nmea.addEncoder(new nmea.GgaEncoder("GPGGA"));
