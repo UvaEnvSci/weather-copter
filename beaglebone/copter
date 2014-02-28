@@ -1,0 +1,10 @@
+# Stored at /etc/copter and made executable
+sleep 20
+# enable the UART1
+echo BB-UART1 > /sys/devices/bone_capemgr*/slots
+# baud rate of the weatherstation
+stty -F /dev/ttyUSB0 4800
+# baud rate of the xbee
+stty -F /dev/ttyO1 9600
+# cat the weatherstation data to the xbee and a log on the sdcard
+cat /dev/ttyUSB0 | tee -a /nmealog.txt /dev/ttyO1 &
