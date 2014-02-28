@@ -19,7 +19,7 @@ $(function(){
   chooser.change(function(){
     if (chooser.val() != "nope")  // "nope" is the default value of the "select a port" option
       //chrome.serial.connect(chooser.val(), {bitrate: parseInt(baudRate.val())}, onConnect);
-      chrome.serial.connect(chooser.val(), {bitrate: 4800}, onConnect);
+      chrome.serial.connect(chooser.val(), {bitrate: 9600}, onConnect);
   });
   
   // Do this after the port connection is made
