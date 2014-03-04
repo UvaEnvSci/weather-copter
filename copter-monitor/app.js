@@ -80,12 +80,57 @@ $(function(){
   var speed = $('<dt>speed over ground</dt><dd></dd>').hide().appendTo(infoList);
   var time = $('<dt>time</dt><dd></dd>').hide().appendTo(infoList);
 
+            var options = {
+                            chart: {renderTo: 'container'}, 
+                            title: {text: 'Temp'},
+                            subtitle: {text: ' '},
+                            xAxis: {text: 'Time',type: 'datetime'},
+                            yAxis: [{ // left y axis
+                                        title: {text: 'Temperature (℉)'},
+                                        labels: {align: 'left', x: 3, y: 16,
+                                                formatter: function() {
+                                        return Highcharts.numberFormat(this.value, 0);}
+                                    },
+                                    showFirstLabel: false}, 
+                                    { // right y axis
+                                        linkedTo: 0, gridLineWidth: 0, opposite: true,
+                                        title: {text: 'Temperature (℉)'},
+                                                labels: {align: 'right', x: -3, y: 16,
+                                                    formatter: function() {
+                                        return Highcharts.numberFormat(this.value, 0);}
+                                    },
+                                    showFirstLabel: false
+                            }],
+//                            legend: {align: 'left', verticalAlign: 'top', y: 20,
+//                                    floating: true, borderWidth: 0},
+//                            tooltip: {shared: true, crosshairs: true},
+//                            plotOptions: {  series: {cursor: 'pointer',
+//                                                    point: {events: {
+//                                                    click: function() {
+//                                                    hs.htmlExpand(null, {
+//                                                    pageOrigin: {
+//                                                        x: this.pageX, 
+//                                                        y: this.pageY
+//                                                    },
+//                                                    headingText: this.series.name,
+//                                                    maincontentText: Highcharts.dateFormat('%A, %b %e, %Y', this.x) +':<br/> '+ 
+//                                                    this.y +'(℉)',
+//                                                    width: 200});
+//                                                    }}},
+//                            marker: {lineWidth: 1}}},
+                            series: [   {name: 'Air Temp'}
+                                    ]
+            };
+    var chart = new Highcharts.Chart(options);
+
   var showData = function(obj){
     if(obj && (!obj['status'] || obj['status'] == 'A')) {
       if(obj.pressureMercury != null && obj.pressureBars != null)
         pressure.show().filter('dd').html(obj.pressureMercury+' ('+obj.pressureBars+')');
-      if(obj.airTemp != null)
+      if(obj.airTemp != null) {
         airTemp.show().filter('dd').html(obj.airTemp);
+        chart.series[0].addPoint([new Date().getTime(), obj.airTemp]);
+      }
       if(obj.humidity != null)
         humidity.show().filter('dd').html(obj.humidity);
       if(obj.dewPoint != null)
