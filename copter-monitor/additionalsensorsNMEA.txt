@@ -1,0 +1,16 @@
+$LTTMP,<1>
+<1> = temperature, degrees C
+$SHTTH,<1>,<2>
+<1> = temperature, degrees C
+<2> = relative humidity, %
+$TENDF,<1>,<2>,<3>
+<1> = rate of rotation, x 
+<2> = rate of rotation, y
+<3> = rate of rotation, z
+<4> = acceleration, x
+<5> = acceleration, y
+<6> = acceleration, z
+<7> = pressure, Pa
+<8> = temperature, degrees C
+<9> = altitude, m
+<10> = heading, degrees N
