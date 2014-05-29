@@ -81,12 +81,21 @@ $(function(){
   var time = $('<dt>time</dt><dd></dd>').hide().appendTo(infoList);
 
             var options = {
-                            chart: {renderTo: 'container'}, 
+                            chart: {
+                              zoomType: 'x',
+                              renderTo: 'container'
+                            }, 
                             title: {text: 'Temp'},
-                            subtitle: {text: ' '},
-                            xAxis: {text: 'Time',type: 'datetime'},
+                            subtitle: {text: document.ontouchstart === undefined?
+                                          'Click and drag in the plot area to zoom in':
+                                           'Pinch the chart to zoom in'
+                                         },
+                            xAxis: {
+                                      title: {text: null},
+                                      type: 'datetime'
+                                    },
                             yAxis: [{ // left y axis
-                                        title: {text: 'Temperature (℉)'},
+                                        title: {text: 'Temperature (C)'},
                                         labels: {align: 'left', x: 3, y: 16,
                                                 formatter: function() {
                                         return Highcharts.numberFormat(this.value, 0);}
@@ -94,7 +103,7 @@ $(function(){
                                     showFirstLabel: false}, 
                                     { // right y axis
                                         linkedTo: 0, gridLineWidth: 0, opposite: true,
-                                        title: {text: 'Temperature (℉)'},
+                                        title: {text: 'Temperature (C)'},
                                                 labels: {align: 'right', x: -3, y: 16,
                                                     formatter: function() {
                                         return Highcharts.numberFormat(this.value, 0);}
@@ -103,7 +112,7 @@ $(function(){
                             }],
 //                            legend: {align: 'left', verticalAlign: 'top', y: 20,
 //                                    floating: true, borderWidth: 0},
-//                            tooltip: {shared: true, crosshairs: true},
+                            tooltip: {shared: true, crosshairs: true},
 //                            plotOptions: {  series: {cursor: 'pointer',
 //                                                    point: {events: {
 //                                                    click: function() {
