@@ -35,7 +35,7 @@ byte measType = TEMP;
 unsigned long trhMillis = 0;             // Time interval tracking
 
 //Linear Thermistor
-int inPin = A2;
+int inPin = A1;
 double inputValue;
 double tempInCelsius;
 double slope = -0.1302;    //Place calibrated thermistor slope here in degC/V
@@ -108,21 +108,21 @@ void loop ()
      printLT();
       Serial.print(',');
       file.print(',');
-     printSHT();
-      Serial.print(',');
-      file.print(',');
-//     printGryo();
+//     printSHT();
 //      Serial.print(',');
 //      file.print(',');
+     printGryo();
+      Serial.print(',');
+      file.print(',');
 //     printAccel();
 //      Serial.print(',');
 //      file.print(',');
-//     printBMP();
-//      Serial.print(',');
-//      file.print(',');
-//     printHeading();
-//      Serial.print(',');
-//      file.print(',');
+     printBMP();
+      Serial.print(',');
+      file.print(',');
+     printHeading();
+      Serial.print(',');
+      file.print(',');
   while(mySDI12.available()){    // write the response to the screen
     char i = mySDI12.read();
     if (i != '\n') {
@@ -184,12 +184,12 @@ void printGryo() {
   Serial.print(",");
   Serial.print((int)gyro.g.y);
   Serial.print(",");
-  Serial.println((int)gyro.g.z);
+  Serial.print((int)gyro.g.z);
   file.print((int)gyro.g.x);
   file.print(",");
   file.print((int)gyro.g.y);
   file.print(",");
-  file.println((int)gyro.g.z);
+  file.print((int)gyro.g.z);
 }
 
 // accel values
@@ -216,6 +216,11 @@ void printBMP(){
   Serial.print(bmp.readPressure());
   Serial.print(",");
   Serial.print(bmp.readAltitude());
+  file.print(bmp.readTemperature());
+  file.print(",");
+  file.print(bmp.readPressure());
+  file.print(",");
+  file.print(bmp.readAltitude());
 }
 
 // compass heading
